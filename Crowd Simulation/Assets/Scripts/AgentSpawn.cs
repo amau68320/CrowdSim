@@ -6,8 +6,8 @@ public class AgentSpawn : MonoBehaviour
 {
     public GameObject male;
     public GameObject female;
-    public float spawnTime = 0.5f;
-    public int maxAgentNbr = 100;
+    public float spawnTime = 0.2f;
+    public static int maxAgentNbr = 100;
     int nbrSpawnedAgents = 0;
     GameObject spawn1;
     GameObject spawn2;
@@ -18,12 +18,6 @@ public class AgentSpawn : MonoBehaviour
         spawn1 = GameObject.Find("Spawner1");
         spawn2 = GameObject.Find("Spawner2");
         InvokeRepeating("Spawn", 0.1f, spawnTime);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     void Spawn()

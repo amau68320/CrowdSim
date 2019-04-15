@@ -1,8 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
-
+using UnityEngine.AI; 
 // marche pas fdp
 public class SpawnWalk : MonoBehaviour
 {
@@ -12,12 +11,11 @@ public class SpawnWalk : MonoBehaviour
     // for Initialization
     void Awake()
     {
+        float x = Random.Range(-11f, 10f);
+        float z = Random.Range(-6.7f, 6.8f);
+
         agent = GetComponent<NavMeshAgent>();
+        agent.SetDestination(new Vector3(x, this.gameObject.transform.position.y, z));
     }
 
-    public void MoveToLocation(Vector3 targetPoint)
-    {
-        agent.destination = targetPoint;
-        agent.isStopped = false;
-    }
 }
