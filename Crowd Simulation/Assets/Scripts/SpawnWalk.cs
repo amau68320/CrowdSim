@@ -2,21 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI; 
-// marche pas fdp
+
 public class SpawnWalk : MonoBehaviour
 {
     private NavMeshAgent agent;
     private Animator animator;
+    private NavMeshObstacle obstacle;
+    private float xDest;
+    private float zDest;
 
     // for Initialization
     void Awake()
     {
-        float x = Random.Range(-11f, 10f);
-        float z = Random.Range(-6.7f, 6.8f);
+        xDest = Random.Range(-11f, 10f);
+        zDest = Random.Range(-6.7f, 6.8f);
 
+        obstacle = GetComponent<NavMeshObstacle>();
         animator = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();
-        agent.SetDestination(new Vector3(x, this.gameObject.transform.position.y, z));
+        agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
     }
 
     void Update()
@@ -28,9 +32,23 @@ public class SpawnWalk : MonoBehaviour
             {
                 if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
                 {
-                    animator.SetTrigger("StopWalk");
+                    animator.SetBool("isWalking", false);
+                    animator.SetBool("isWaiting", true);
+                    agent.enabled = false;
+                    obstacle.enabled = true;
                 }
             }
+        }
+
+        if(obstacle.enabled && ((this.transform.position.x < -11f) || (this.transform.position.x > 10f) || (this.transform.position.z <-6.7f) || (this.transform.position.z > 6.8f)))
+        {
+            animator.SetBool("isWalking", true);
+            animator.SetBool("isWaiting", false);
+            agent.enabled = true;
+            obstacle.enabled = false;
+            animator.SetTrigger("ReWalk");
+            agent.ResetPath();
+            agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
         }
     }
 
