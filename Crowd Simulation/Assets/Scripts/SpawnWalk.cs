@@ -46,7 +46,6 @@ public class SpawnWalk : MonoBehaviour
             animator.SetBool("isWaiting", false);
             agent.enabled = true;
             obstacle.enabled = false;
-            animator.SetTrigger("ReWalk");
             agent.ResetPath();
             agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
         }
