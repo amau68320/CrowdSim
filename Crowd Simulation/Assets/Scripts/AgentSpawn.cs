@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class AgentSpawn : MonoBehaviour
 {
@@ -28,19 +29,20 @@ public class AgentSpawn : MonoBehaviour
         bool spawner = Random.Range(0, 2) == 1 ? true : false;
         bool character = Random.Range(0, 2) == 1 ? true : false;
 
+        // we always set priority at spawn for avoidance (it goes from 0 to 99)
         if (spawner)
         {
             if (character)
-                Instantiate(male, spawn1.transform.position, spawn1.transform.rotation);
+                Instantiate(male, spawn1.transform.position, spawn1.transform.rotation).GetComponent<NavMeshAgent>().avoidancePriority = nbrSpawnedAgents;
             else
-                Instantiate(female, spawn1.transform.position, spawn1.transform.rotation);
+                Instantiate(female, spawn1.transform.position, spawn1.transform.rotation).GetComponent<NavMeshAgent>().avoidancePriority = nbrSpawnedAgents;
         }
         else
         {
             if (character)
-                Instantiate(male, spawn2.transform.position, spawn2.transform.rotation);
+                Instantiate(male, spawn2.transform.position, spawn2.transform.rotation).GetComponent<NavMeshAgent>().avoidancePriority = nbrSpawnedAgents;
             else
-                Instantiate(female, spawn2.transform.position, spawn2.transform.rotation);
+                Instantiate(female, spawn2.transform.position, spawn2.transform.rotation).GetComponent<NavMeshAgent>().avoidancePriority = nbrSpawnedAgents;
         }
 
         nbrSpawnedAgents++;
