@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class DoorPassing : MonoBehaviour
 {
-    private void OnTriggerExit()
+    private void OnTriggerExit(Collider perso)
     {
-        CheckAllEntered.nbrAgentEntered++;
+        if(string.Equals(perso.gameObject.name, "male(Clone)") || string.Equals(perso.gameObject.name, "female(Clone)"))
+            CheckAllEntered.nbrAgentEntered++;
     }
 }
