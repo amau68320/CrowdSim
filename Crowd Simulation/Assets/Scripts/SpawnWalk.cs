@@ -14,8 +14,9 @@ public class SpawnWalk : MonoBehaviour
     // for Initialization
     void Awake()
     {
-        xDest = Random.Range(-11f, 10f);
-        zDest = Random.Range(-6.7f, 6.8f);
+        xDest = Random.Range(-10.5f, 9.5f);
+        zDest = Random.Range(-6.5f, 6.5f);
+
 
         obstacle = GetComponent<NavMeshObstacle>();
         animator = GetComponent<Animator>();
@@ -26,13 +27,14 @@ public class SpawnWalk : MonoBehaviour
     void Update()
     {
         // has reach its final position test
-        if (!agent.pathPending)
+        if (agent.enabled && !agent.pathPending)
         {
             if (agent.remainingDistance <= agent.stoppingDistance)
             {
                 if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
                 {
                     animator.SetBool("isWalking", false);
+                    animator.Rebind();
                     animator.SetBool("isWaiting", true);
                     agent.enabled = false;
                     obstacle.enabled = true;
@@ -40,13 +42,13 @@ public class SpawnWalk : MonoBehaviour
             }
         }
 
-        if(obstacle.enabled && ((this.transform.position.x < -11f) || (this.transform.position.x > 10f) || (this.transform.position.z <-6.7f) || (this.transform.position.z > 6.8f)))
+        if(obstacle.enabled && ((this.transform.position.x < -10.7f) || (this.transform.position.x > 9.7f) || (this.transform.position.z <-6.7f) || (this.transform.position.z > 6.7f)))
         {
-            animator.SetBool("isWalking", true);
             animator.SetBool("isWaiting", false);
-            agent.enabled = true;
+            animator.Rebind();
+            animator.SetBool("isWalking", true);
             obstacle.enabled = false;
-            agent.ResetPath();
+            agent.enabled = true;
             agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
         }
     }

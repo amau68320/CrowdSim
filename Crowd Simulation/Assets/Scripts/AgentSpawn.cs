@@ -33,16 +33,16 @@ public class AgentSpawn : MonoBehaviour
         if (spawner)
         {
             if (character)
-                Instantiate(male, spawn1.transform.position, spawn1.transform.rotation).GetComponent<NavMeshAgent>().avoidancePriority = nbrSpawnedAgents;
+                Instantiate(male, spawn1.transform.position, spawn1.transform.rotation);
             else
-                Instantiate(female, spawn1.transform.position, spawn1.transform.rotation).GetComponent<NavMeshAgent>().avoidancePriority = nbrSpawnedAgents;
+                Instantiate(female, spawn1.transform.position, spawn1.transform.rotation);
         }
         else
         {
             if (character)
-                Instantiate(male, spawn2.transform.position, spawn2.transform.rotation).GetComponent<NavMeshAgent>().avoidancePriority = nbrSpawnedAgents;
+                Instantiate(male, spawn2.transform.position, spawn2.transform.rotation);
             else
-                Instantiate(female, spawn2.transform.position, spawn2.transform.rotation).GetComponent<NavMeshAgent>().avoidancePriority = nbrSpawnedAgents;
+                Instantiate(female, spawn2.transform.position, spawn2.transform.rotation);
         }
 
         nbrSpawnedAgents++;
