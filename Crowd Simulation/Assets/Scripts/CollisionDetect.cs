@@ -6,12 +6,13 @@ using UnityEngine.AI;
 public class CollisionDetect : MonoBehaviour
 {
     public bool isInFront = false;
-    private float timeColliding = Random.Range(1.0f,3.0f);
+    private float timeColliding;
     private NavMeshAgent agent;
     private NavMeshObstacle obstacle;
 
     void Start()
     {
+        timeColliding = Random.Range(1.0f, 3.0f);
         agent = gameObject.GetComponentInParent<NavMeshAgent>();
         obstacle = gameObject.GetComponentInParent<NavMeshObstacle>();
     }

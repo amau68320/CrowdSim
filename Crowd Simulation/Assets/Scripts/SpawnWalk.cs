@@ -51,6 +51,11 @@ public class SpawnWalk : MonoBehaviour
             agent.enabled = true;
             agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
         }
+        else if(obstacle.enabled)
+        {
+            gameObject.GetComponent<AgentManager>().enabled = true;
+            this.enabled = false;
+        }
     }
 
 }
