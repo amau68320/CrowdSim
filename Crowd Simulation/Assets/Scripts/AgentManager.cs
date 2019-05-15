@@ -9,12 +9,15 @@ enum States
     GOINGTOEAT = 1,
     EATING = 2,
     TALKING = 3,
-    GOINGTOTALK = 4
+    GOINGTOTALK = 4,
+    GOINGTOWALL = 5
 }
 
 // the agent behavior during the party will be managed by a state machine
 public class AgentManager : MonoBehaviour
 {
+    public static bool hasToWait;
+    private float timeToWait;
     private States currentState;
     private float hunger;
     private float shyness;
@@ -27,7 +30,9 @@ public class AgentManager : MonoBehaviour
 
     void Start()
     {
+        hasToWait = false;
         currentState = States.WAITING;
+        timeToWait = 3.0f;
         obstacle = GetComponent<NavMeshObstacle>();
         animator = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();
@@ -38,36 +43,14 @@ public class AgentManager : MonoBehaviour
 
     void Update()
     {
-        if(currentState == States.WAITING)
+        if(hasToWait)
         {
-            float choice = Random.Range(0.0f, 1.0f);
-
-            // we still waiting 99.9% of the update and depending on a moveRate 
-            if(choice >= (0.999f + moveRate))
-            {
-                if (Random.Range(0.0f, 100f) < shyness)
-                {
-                    //eloign from group 
-                    animator.SetBool("isWaiting", false);
-                    animator.Rebind();
-                    animator.SetBool("isWalking", true);
-                }
-                else
-                {
-                    if (Random.Range(0.0f, 100.0f) < hunger)
-                    {
-                        // eat
-                        SelectTable();
-                    }
-                    else
-                    {
-                        // call someone to talk
-                        animator.SetBool("isWaiting", false);
-                        animator.Rebind();
-                        animator.SetBool("isTalking", true);
-                    }
-                }
-            }
+            // In case that the agent must let an other agent pass the way before
+            ManageWaiting();
+        }
+        else if(currentState == States.WAITING)
+        {
+            ChooseActionWhileWaiting();
         }
         else if(currentState == States.GOINGTOEAT)
         {
@@ -77,10 +60,10 @@ public class AgentManager : MonoBehaviour
 
     void CheckReachTable()
     {
-        if (agent.enabled)
-        {
-            if (!agent.pathPending && (agent.remainingDistance <= agent.stoppingDistance))
-            {
+        if(agent.enabled)
+        { 
+             if (!agent.pathPending && (agent.remainingDistance <= agent.stoppingDistance))
+             {
                 if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
                 {
                     animator.SetBool("isWalking", false);
@@ -89,6 +72,40 @@ public class AgentManager : MonoBehaviour
                     agent.enabled = false;
                     obstacle.enabled = true;
                     currentState = States.EATING;
+                }  
+            }
+        }
+    }
+
+    void ChooseActionWhileWaiting()
+    {
+        float choice = Random.Range(0.0f, 1.0f);
+
+        // we still waiting 99.9% of the update and depending on a moveRate 
+        if (choice >= (0.999f + moveRate))
+        {
+            if (Random.Range(0.0f, 100f) < shyness)
+            {
+                //eloign from group 
+                animator.SetBool("isWaiting", false);
+                animator.Rebind();
+                animator.SetBool("isWalking", true);
+                currentState = States.GOINGTOWALL ;
+            }
+            else
+            {
+                if (Random.Range(0.0f, 100.0f) < hunger)
+                {
+                    // eat
+                    SelectTable();
+                }
+                else
+                {
+                    // call someone to talk
+                    animator.SetBool("isWaiting", false);
+                    animator.Rebind();
+                    animator.SetBool("isTalking", true);
+                    currentState = States.GOINGTOTALK;
                 }
             }
         }
@@ -131,5 +148,23 @@ public class AgentManager : MonoBehaviour
         }
         agent.SetDestination((new Vector3(xDest, 0.0f, zDest)));
         currentState = States.GOINGTOEAT;
+    }
+
+    void ManageWaiting()
+    {
+        if (timeToWait <= 0.0f)
+        {
+            animator.SetBool("isWaiting", false);
+            animator.Rebind();
+            animator.SetBool("isWalking", true);
+            obstacle.enabled = false;
+            agent.enabled = true;
+            agent.SetDestination(new Vector3(xDest, 0.0f, zDest));
+            hasToWait = false;
+        }
+        else
+        {
+            timeToWait -= Time.deltaTime;
+        }
     }
 }

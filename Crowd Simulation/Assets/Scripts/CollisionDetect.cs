@@ -44,6 +44,9 @@ public class CollisionDetect : MonoBehaviour
                 agent.enabled = false;
                 obstacle.enabled = true;
                 timeColliding = Random.Range(3.0f, 5.0f);
+
+                if(gameObject.GetComponentInParent<AgentManager>().enabled)
+                    AgentManager.hasToWait = true;
             }
         }
 
