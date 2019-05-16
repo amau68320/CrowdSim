@@ -27,9 +27,19 @@ public class AgentManager : MonoBehaviour
     private NavMeshAgent agent;
     private Animator animator;
     private NavMeshObstacle obstacle;
+    private int TableNbr;
+    private Vector2[] Tables =
+    {
+        new Vector2(4.0f, -6.5f),
+        new Vector2(4.0f, 6.9f),
+        new Vector2(-4.0f, -6.5f),
+        new Vector2(-4.0f, 6.9f),
+        new Vector2(0.0f, 0.65f)
+    };
 
     void Start()
     {
+        TableNbr = 5;
         hasToWait = false;
         currentState = States.WAITING;
         timeToWait = 3.0f;
@@ -56,6 +66,10 @@ public class AgentManager : MonoBehaviour
         {
             CheckReachTable();
         }
+        else if(currentState == States.GOINGTOWALL)
+        {
+            CheckReachDest();
+        }
     }
 
     void CheckReachTable()
@@ -77,6 +91,25 @@ public class AgentManager : MonoBehaviour
         }
     }
 
+    void CheckReachDest()
+    {
+        if (agent.enabled)
+        {
+            if (!agent.pathPending && (agent.remainingDistance <= agent.stoppingDistance))
+            {
+                if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                {
+                    animator.SetBool("isWalking", false);
+                    animator.Rebind();
+                    animator.SetBool("isWaiting", true);
+                    agent.enabled = false;
+                    obstacle.enabled = true;
+                    currentState = States.WAITING;
+                }
+            }
+        }
+    }
+
     void ChooseActionWhileWaiting()
     {
         float choice = Random.Range(0.0f, 1.0f);
@@ -86,11 +119,7 @@ public class AgentManager : MonoBehaviour
         {
             if (Random.Range(0.0f, 100f) < shyness)
             {
-                //eloign from group 
-                animator.SetBool("isWaiting", false);
-                animator.Rebind();
-                animator.SetBool("isWalking", true);
-                currentState = States.GOINGTOWALL ;
+                MoveAway();
             }
             else
             {
@@ -113,40 +142,16 @@ public class AgentManager : MonoBehaviour
 
     void SelectTable()
     {
+        int TableIndex = 0;
         animator.SetBool("isWaiting", false);
         animator.Rebind();
         animator.SetBool("isWalking", true);
         obstacle.enabled = false;
         agent.enabled = true;
-
-        switch(Random.Range(0,5))
-        {
-            case 0:
-                xDest = 4.0f;
-                zDest = -6.5f;
-                break;
-
-            case 1:
-                xDest = -4.0f;
-                zDest = -6.5f;
-                break;
-
-            case 2:
-                xDest = -4.0f;
-                zDest = 6.9f;
-                break;
-
-            case 3:
-                xDest = 4.0f;
-                zDest = 6.9f;
-                break;
-
-            case 4:
-                xDest = 0.0f;
-                zDest = 0.65f;
-                break;
-        }
-        agent.SetDestination((new Vector3(xDest, 0.0f, zDest)));
+        TableIndex = ClosestTableIndex();
+        xDest = Tables[TableIndex].x;
+        zDest = Tables[TableIndex].y;
+        agent.SetDestination((new Vector3(xDest, this.gameObject.transform.position.y, zDest)));
         currentState = States.GOINGTOEAT;
     }
 
@@ -159,12 +164,59 @@ public class AgentManager : MonoBehaviour
             animator.SetBool("isWalking", true);
             obstacle.enabled = false;
             agent.enabled = true;
-            agent.SetDestination(new Vector3(xDest, 0.0f, zDest));
+            agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
             hasToWait = false;
         }
         else
         {
             timeToWait -= Time.deltaTime;
         }
+    }
+
+    void MoveAway()
+    {
+        float minDist = float.MaxValue;
+        float tmp;
+        do
+        {
+            xDest = Random.Range(-10.7f, 9.7f);
+            zDest = Random.Range(-6.7f, 6.7f);
+
+            foreach (GameObject ag in AllAgents.agents)
+            { 
+                tmp = Vector3.Distance(ag.transform.position, new Vector3(xDest, this.gameObject.transform.position.y, zDest));
+
+                if (tmp < minDist)
+                    minDist = tmp;
+            }
+        } while (minDist >= 5.0f);
+
+        animator.SetBool("isWaiting", false);
+        animator.Rebind();
+        animator.SetBool("isWalking", true);
+        obstacle.enabled = false;
+        agent.enabled = true;
+        agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
+        currentState = States.GOINGTOWALL;
+    }
+
+    int ClosestTableIndex()
+    {
+        int Index = 0;
+        float MinDistance = float.MaxValue;
+        float tmp;
+        for(int i = 0;i<TableNbr;i++)
+        {
+            tmp = Mathf.Sqrt(Mathf.Pow(this.gameObject.transform.position.x - Tables[i].x, 2) +
+                          Mathf.Pow(this.gameObject.transform.position.z - Tables[i].y, 2));
+
+            if (MinDistance > tmp)
+            {
+                MinDistance = tmp;
+                Index = i;
+            }
+        }
+
+        return Index;
     }
 }

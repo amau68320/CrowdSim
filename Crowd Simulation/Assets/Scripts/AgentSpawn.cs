@@ -23,7 +23,10 @@ public class AgentSpawn : MonoBehaviour
     void Spawn()
     {
         if (nbrSpawnedAgents >= maxAgentNbr)
+        {
+            this.enabled = false;
             return;
+        }
 
         bool spawner = Random.Range(0, 2) == 1 ? true : false;
         bool character = Random.Range(0, 2) == 1 ? true : false;
@@ -32,16 +35,16 @@ public class AgentSpawn : MonoBehaviour
         if (spawner)
         {
             if (character)
-                Instantiate(male, spawn1.transform.position, spawn1.transform.rotation);
+                AllAgents.agents.Add(Instantiate(male, spawn1.transform.position, spawn1.transform.rotation));
             else
-                Instantiate(female, spawn1.transform.position, spawn1.transform.rotation);
+                AllAgents.agents.Add(Instantiate(female, spawn1.transform.position, spawn1.transform.rotation));
         }
         else
         {
             if (character)
-                Instantiate(male, spawn2.transform.position, spawn2.transform.rotation);
+                AllAgents.agents.Add(Instantiate(male, spawn2.transform.position, spawn2.transform.rotation));
             else
-                Instantiate(female, spawn2.transform.position, spawn2.transform.rotation);
+                AllAgents.agents.Add(Instantiate(female, spawn2.transform.position, spawn2.transform.rotation));
         }
 
         nbrSpawnedAgents++;
