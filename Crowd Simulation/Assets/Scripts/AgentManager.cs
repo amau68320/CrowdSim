@@ -189,7 +189,7 @@ public class AgentManager : MonoBehaviour
                 if (tmp < minDist)
                     minDist = tmp;
             }
-        } while (minDist >= 5.0f);
+        } while (minDist >= 10.0f);
 
         animator.SetBool("isWaiting", false);
         animator.Rebind();
