@@ -16,7 +16,8 @@ enum States
 // the agent behavior during the party will be managed by a state machine
 public class AgentManager : MonoBehaviour
 {
-    public static bool hasToWait;
+    public  bool hasToWait;
+    public  bool isAtTable;
     private float timeToWait;
     private States currentState;
     private float hunger;
@@ -41,6 +42,7 @@ public class AgentManager : MonoBehaviour
     {
         TableNbr = 5;
         hasToWait = false;
+        isAtTable = false;
         currentState = States.WAITING;
         timeToWait = 3.0f;
         obstacle = GetComponent<NavMeshObstacle>();
@@ -74,19 +76,26 @@ public class AgentManager : MonoBehaviour
 
     void CheckReachTable()
     {
-        if(agent.enabled)
-        { 
-             if (!agent.pathPending && (agent.remainingDistance <= agent.stoppingDistance))
-             {
-                if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
-                {
-                    animator.SetBool("isWalking", false);
-                    animator.Rebind();
-                    animator.SetBool("isEating", true);
-                    agent.enabled = false;
-                    obstacle.enabled = true;
-                    currentState = States.EATING;
-                }  
+        if(isAtTable)
+        {
+            animator.SetBool("isWalking", false);
+            animator.Rebind();
+            animator.SetBool("isEating", true);
+            agent.enabled = false;
+            obstacle.enabled = true;
+            currentState = States.EATING;
+        }
+        else if (!agent.pathPending && (agent.remainingDistance <= agent.stoppingDistance))
+        {
+            //cas ou il n'arrive pas à atteindre la table
+            if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+            {
+                animator.SetBool("isWalking", false);
+                animator.Rebind();
+                animator.SetBool("isWaiting", true);
+                agent.enabled = false;
+                obstacle.enabled = true;
+                currentState = States.WAITING;
             }
         }
     }

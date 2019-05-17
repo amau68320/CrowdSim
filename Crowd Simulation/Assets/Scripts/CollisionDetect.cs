@@ -46,7 +46,7 @@ public class CollisionDetect : MonoBehaviour
                 timeColliding = Random.Range(3.0f, 5.0f);
 
                 if(gameObject.GetComponentInParent<AgentManager>().enabled)
-                    AgentManager.hasToWait = true;
+                    gameObject.GetComponentInParent<AgentManager>().hasToWait = true;
             }
         }
 
