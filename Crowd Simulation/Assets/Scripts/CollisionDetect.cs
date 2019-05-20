@@ -12,7 +12,7 @@ public class CollisionDetect : MonoBehaviour
 
     void Start()
     {
-        timeColliding = Random.Range(1.0f, 3.0f);
+        timeColliding = Random.Range(3.0f, 5.0f);
         agent = gameObject.GetComponentInParent<NavMeshAgent>();
         obstacle = gameObject.GetComponentInParent<NavMeshObstacle>();
     }
@@ -33,7 +33,7 @@ public class CollisionDetect : MonoBehaviour
             if (isInFront)
                 timeColliding -= Time.deltaTime;
             else
-                timeColliding = Random.Range(1.5f,3.0f);
+                timeColliding = Random.Range(3.0f,5.0f);
 
             if (timeColliding <= 0)
             {

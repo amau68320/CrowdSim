@@ -8,6 +8,7 @@ public class SpawnWalk : MonoBehaviour
     private NavMeshAgent agent;
     private Animator animator;
     private NavMeshObstacle obstacle;
+    private NavMeshPath path;
     private float xDest;
     private float zDest;
 
@@ -17,11 +18,12 @@ public class SpawnWalk : MonoBehaviour
         xDest = Random.Range(-10.5f, 9.5f);
         zDest = Random.Range(-6.5f, 6.5f);
 
-
         obstacle = GetComponent<NavMeshObstacle>();
         animator = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();
-        agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
+        path = new NavMeshPath();
+        agent.CalculatePath(new Vector3(xDest, this.gameObject.transform.position.y, zDest), path);
+        agent.SetPath(path);
     }
 
     void LateUpdate()
@@ -49,7 +51,9 @@ public class SpawnWalk : MonoBehaviour
             animator.SetBool("isWalking", true);
             obstacle.enabled = false;
             agent.enabled = true;
-            agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
+            path = new NavMeshPath();
+            agent.CalculatePath(new Vector3(xDest, this.gameObject.transform.position.y, zDest), path);
+            agent.SetPath(path);
         }
         else if(obstacle.enabled)
         {
