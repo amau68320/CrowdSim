@@ -29,7 +29,6 @@ public class AgentManager : MonoBehaviour
     private NavMeshAgent agent;
     private Animator animator;
     private NavMeshObstacle obstacle;
-    private NavMeshPath path;
     private int TableNbr;
     private Vector2[] Tables =
     {
@@ -56,7 +55,7 @@ public class AgentManager : MonoBehaviour
         moveRate = Random.Range(0.0f, 0.005f);
     }
 
-    void LateUpdate()
+    void Update()
     {
         if(hasToWait)
         {
@@ -184,9 +183,7 @@ public class AgentManager : MonoBehaviour
         TableIndex = ClosestTableIndex();
         xDest = Tables[TableIndex].x;
         zDest = Tables[TableIndex].y;
-        path = new NavMeshPath();
-        agent.CalculatePath(new Vector3(xDest, this.gameObject.transform.position.y, zDest), path);
-        agent.SetPath(path);
+        agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
         currentState = States.GOINGTOEAT;
     }
 
@@ -199,9 +196,7 @@ public class AgentManager : MonoBehaviour
             animator.SetBool("isWalking", true);
             obstacle.enabled = false;
             agent.enabled = true;
-            path = new NavMeshPath();
-            agent.CalculatePath(new Vector3(xDest, this.gameObject.transform.position.y, zDest), path);
-            agent.SetPath(path);
+            agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
             hasToWait = false;
         }
         else
@@ -234,9 +229,7 @@ public class AgentManager : MonoBehaviour
             animator.SetBool("isWalking", true);
             obstacle.enabled = false;
             agent.enabled = true;
-            path = new NavMeshPath();
-            agent.CalculatePath(new Vector3(xDest, this.gameObject.transform.position.y, zDest), path);
-            agent.SetPath(path);
+            agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
             currentState = States.GOINGAWAY;
             isSeekingForDistance = false;
         }

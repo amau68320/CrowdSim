@@ -8,7 +8,6 @@ public class SpawnWalk : MonoBehaviour
     private NavMeshAgent agent;
     private Animator animator;
     private NavMeshObstacle obstacle;
-    private NavMeshPath path;
     private float xDest;
     private float zDest;
 
@@ -21,13 +20,12 @@ public class SpawnWalk : MonoBehaviour
         obstacle = GetComponent<NavMeshObstacle>();
         animator = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();
-        path = new NavMeshPath();
-        agent.CalculatePath(new Vector3(xDest, this.gameObject.transform.position.y, zDest), path);
-        agent.SetPath(path);
+        agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
     }
 
-    void LateUpdate()
+    void Update()
     {
+        Debug.Log("putain");
         // has reach its final position test
         if (agent.enabled && !agent.pathPending)
         {
@@ -44,16 +42,14 @@ public class SpawnWalk : MonoBehaviour
             }
         }
 
-        if(obstacle.enabled && ((this.transform.position.x < -10.7f) || (this.transform.position.x > 9.7f) || (this.transform.position.z <-6.7f) || (this.transform.position.z > 6.7f)))
+        if(obstacle.enabled && ((this.gameObject.transform.position.x < -10.7f) || (this.gameObject.transform.position.x > 9.7f) || (this.gameObject.transform.position.z <-6.7f) || (this.gameObject.transform.position.z > 6.7f)))
         {
             animator.SetBool("isWaiting", false);
             animator.Rebind();
             animator.SetBool("isWalking", true);
             obstacle.enabled = false;
             agent.enabled = true;
-            path = new NavMeshPath();
-            agent.CalculatePath(new Vector3(xDest, this.gameObject.transform.position.y, zDest), path);
-            agent.SetPath(path);
+            agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
         }
         else if(obstacle.enabled)
         {
