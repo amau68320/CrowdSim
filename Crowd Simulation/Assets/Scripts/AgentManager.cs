@@ -10,7 +10,7 @@ enum States
     EATING = 2,
     TALKING = 3,
     GOINGTOTALK = 4,
-    GOINGTOWALL = 5
+    GOINGAWAY = 5
 }
 
 // the agent behavior during the party will be managed by a state machine
@@ -18,6 +18,7 @@ public class AgentManager : MonoBehaviour
 {
     public  bool hasToWait;
     public  bool isAtTable;
+    private bool isSeekingForDistance;
     private float timeToWait;
     private States currentState;
     private float hunger;
@@ -43,6 +44,7 @@ public class AgentManager : MonoBehaviour
         TableNbr = 5;
         hasToWait = false;
         isAtTable = false;
+        isSeekingForDistance = false;
         currentState = States.WAITING;
         timeToWait = 3.0f;
         obstacle = GetComponent<NavMeshObstacle>();
@@ -50,25 +52,33 @@ public class AgentManager : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         hunger = Random.Range(0.0f, 100.0f);
         shyness = Random.Range(0.0f, 100.0f);
-        moveRate = Random.Range(0.0f, 0.001f);
+        moveRate = Random.Range(0.0f, 0.005f);
     }
 
-    void Update()
+    void LateUpdate()
     {
         if(hasToWait)
         {
             // In case that the agent must let an other agent pass the way before
             ManageWaiting();
         }
+        else if(isSeekingForDistance)
+        {
+            MoveAway();
+        }
         else if(currentState == States.WAITING)
         {
             ChooseActionWhileWaiting();
+        }
+        else if(currentState == States.EATING)
+        {
+            ChooseActionWhileEating();
         }
         else if(currentState == States.GOINGTOEAT)
         {
             CheckReachTable();
         }
-        else if(currentState == States.GOINGTOWALL)
+        else if(currentState == States.GOINGAWAY)
         {
             CheckReachDest();
         }
@@ -123,11 +133,12 @@ public class AgentManager : MonoBehaviour
     {
         float choice = Random.Range(0.0f, 1.0f);
 
-        // we still waiting 99.9% of the update and depending on a moveRate 
-        if (choice >= (0.999f + moveRate))
+        // we still waiting 99.5% of the update and depending on a moveRate 
+        if (choice >= (0.995f + moveRate))
         {
             if (Random.Range(0.0f, 100f) < shyness)
             {
+                isSeekingForDistance = true;
                 MoveAway();
             }
             else
@@ -146,6 +157,18 @@ public class AgentManager : MonoBehaviour
                     currentState = States.GOINGTOTALK;
                 }
             }
+        }
+    }
+
+    void ChooseActionWhileEating()
+    {
+        float choice = Random.Range(0.0f, 1.0f);
+
+        // we still eating 99.5% of the update
+        if (choice >= 0.995f)
+        {
+            isSeekingForDistance = true;
+            MoveAway();
         }
     }
 
@@ -186,27 +209,30 @@ public class AgentManager : MonoBehaviour
     {
         float minDist = float.MaxValue;
         float tmp;
-        do
+
+        xDest = Random.Range(-10.7f, 9.7f);
+        zDest = Random.Range(-6.7f, 6.7f);
+
+        foreach (GameObject ag in AllAgents.agents)
+        { 
+            tmp = Vector3.Distance(ag.transform.position, new Vector3(xDest, this.gameObject.transform.position.y, zDest));
+
+            if (tmp < minDist)
+                minDist = tmp;
+        }
+
+        if (minDist >= 2.0f)
         {
-            xDest = Random.Range(-10.7f, 9.7f);
-            zDest = Random.Range(-6.7f, 6.7f);
-
-            foreach (GameObject ag in AllAgents.agents)
-            { 
-                tmp = Vector3.Distance(ag.transform.position, new Vector3(xDest, this.gameObject.transform.position.y, zDest));
-
-                if (tmp < minDist)
-                    minDist = tmp;
-            }
-        } while (minDist >= 10.0f);
-
-        animator.SetBool("isWaiting", false);
-        animator.Rebind();
-        animator.SetBool("isWalking", true);
-        obstacle.enabled = false;
-        agent.enabled = true;
-        agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
-        currentState = States.GOINGTOWALL;
+            animator.SetBool("isWaiting", false);
+            animator.SetBool("isEating", false);
+            animator.Rebind();
+            animator.SetBool("isWalking", true);
+            obstacle.enabled = false;
+            agent.enabled = true;
+            agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
+            currentState = States.GOINGAWAY;
+            isSeekingForDistance = false;
+        }
     }
 
     int ClosestTableIndex()

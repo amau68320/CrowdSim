@@ -24,7 +24,7 @@ public class SpawnWalk : MonoBehaviour
         agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
     }
 
-    void Update()
+    void LateUpdate()
     {
         // has reach its final position test
         if (agent.enabled && !agent.pathPending)

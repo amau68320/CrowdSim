@@ -331,6 +331,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6821044bceeba154b924451eed6231c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hasToWait: 0
+  isAtTable: 0
 --- !u!1 &4746344782556170346
 GameObject:
   m_ObjectHideFlags: 0
