@@ -23,6 +23,8 @@ public class CheckAllEntered : MonoBehaviour
             GameObject.Find("doorP1-2").transform.Rotate(0, 150, 0, Space.Self);
             nbrAgentEntered = 0;
             waitTime = 3f;
+
+            this.enabled = false;
         }
     }
 }

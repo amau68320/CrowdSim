@@ -25,7 +25,6 @@ public class SpawnWalk : MonoBehaviour
 
     void Update()
     {
-        Debug.Log("putain");
         // has reach its final position test
         if (agent.enabled && !agent.pathPending)
         {

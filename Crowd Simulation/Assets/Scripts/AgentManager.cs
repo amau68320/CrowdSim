@@ -175,9 +175,6 @@ public class AgentManager : MonoBehaviour
     void SelectTable()
     {
         int TableIndex = 0;
-        animator.SetBool("isWaiting", false);
-        animator.Rebind();
-        animator.SetBool("isWalking", true);
         obstacle.enabled = false;
         agent.enabled = true;
         TableIndex = ClosestTableIndex();
@@ -185,19 +182,22 @@ public class AgentManager : MonoBehaviour
         zDest = Tables[TableIndex].y;
         agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
         currentState = States.GOINGTOEAT;
+        animator.SetBool("isWaiting", false);
+        animator.Rebind();
+        animator.SetBool("isWalking", true);
     }
 
     void ManageWaiting()
     {
         if (timeToWait <= 0.0f)
         {
-            animator.SetBool("isWaiting", false);
-            animator.Rebind();
-            animator.SetBool("isWalking", true);
             obstacle.enabled = false;
             agent.enabled = true;
             agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
             hasToWait = false;
+            animator.SetBool("isWaiting", false);
+            animator.Rebind();
+            animator.SetBool("isWalking", true);
         }
         else
         {
@@ -214,24 +214,24 @@ public class AgentManager : MonoBehaviour
         zDest = Random.Range(-6.7f, 6.7f);
 
         foreach (GameObject ag in AllAgents.agents)
-        { 
-            tmp = Vector3.Distance(ag.transform.position, new Vector3(xDest, this.gameObject.transform.position.y, zDest));
+        {
+            tmp = Mathf.Sqrt(Mathf.Pow(ag.transform.position.x - xDest, 2.0f) + Mathf.Pow(ag.transform.position.z - zDest, 2.0f));
 
             if (tmp < minDist)
                 minDist = tmp;
         }
 
-        if (minDist >= 2.0f)
+        if (minDist >= 1.5f)
         {
-            animator.SetBool("isWaiting", false);
-            animator.SetBool("isEating", false);
-            animator.Rebind();
-            animator.SetBool("isWalking", true);
+            isSeekingForDistance = false;
             obstacle.enabled = false;
             agent.enabled = true;
             agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
             currentState = States.GOINGAWAY;
-            isSeekingForDistance = false;
+            animator.SetBool("isWaiting", false);
+            animator.SetBool("isEating", false);
+            animator.Rebind();
+            animator.SetBool("isWalking", true);
         }
     }
 

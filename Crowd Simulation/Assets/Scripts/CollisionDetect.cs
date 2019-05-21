@@ -6,13 +6,15 @@ using UnityEngine.AI;
 public class CollisionDetect : MonoBehaviour
 {
     public bool isInFront = false;
+    private float fixTimeColliding;
     private float timeColliding;
     private NavMeshAgent agent;
     private NavMeshObstacle obstacle;
 
     void Start()
     {
-        timeColliding = Random.Range(1.5f, 3.0f);
+        fixTimeColliding = Random.Range(1.0f, 5.0f);
+        timeColliding = fixTimeColliding;
         agent = gameObject.GetComponentInParent<NavMeshAgent>();
         obstacle = gameObject.GetComponentInParent<NavMeshObstacle>();
     }
@@ -33,7 +35,7 @@ public class CollisionDetect : MonoBehaviour
             if (isInFront)
                 timeColliding -= Time.deltaTime;
             else
-                timeColliding = Random.Range(1.5f,3.0f);
+                timeColliding = fixTimeColliding;
 
             if (timeColliding <= 0)
             {
@@ -43,11 +45,15 @@ public class CollisionDetect : MonoBehaviour
                 animator.SetBool("isWaiting", true);
                 agent.enabled = false;
                 obstacle.enabled = true;
-                timeColliding = Random.Range(1.5f, 3.0f);
+                timeColliding = fixTimeColliding;
 
                 if (gameObject.GetComponentInParent<AgentManager>().enabled)
                     gameObject.GetComponentInParent<AgentManager>().hasToWait = true;
             }
+        }
+        else
+        {
+            timeColliding = fixTimeColliding;
         }
 
     }
