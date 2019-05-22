@@ -26,6 +26,7 @@ public class AgentManager : MonoBehaviour
     private float moveRate;
     private float xDest;
     private float zDest;
+    private int TableIndex;
     private NavMeshAgent agent;
     private Animator animator;
     private NavMeshObstacle obstacle;
@@ -42,6 +43,7 @@ public class AgentManager : MonoBehaviour
     void Start()
     {
         TableNbr = 5;
+        TableIndex = 0;
         hasToWait = false;
         isAtTable = false;
         isSeekingForDistance = false;
@@ -52,7 +54,7 @@ public class AgentManager : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         hunger = Random.Range(0.0f, 100.0f);
         shyness = Random.Range(0.0f, 100.0f);
-        moveRate = Random.Range(0.0f, 0.005f);
+        moveRate = Random.Range(0.0f, 0.001f);
     }
 
     void Update()
@@ -88,6 +90,9 @@ public class AgentManager : MonoBehaviour
     {
         if(isAtTable)
         {
+            Vector3 relativePos = new Vector3(Tables[TableIndex].x, this.gameObject.transform.position.y, Tables[TableIndex].y) - this.gameObject.transform.position;
+            Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
+            this.gameObject.transform.rotation = rotation;
             animator.SetBool("isWalking", false);
             animator.Rebind();
             animator.SetBool("isEating", true);
@@ -133,8 +138,8 @@ public class AgentManager : MonoBehaviour
     {
         float choice = Random.Range(0.0f, 1.0f);
 
-        // we still waiting 99.5% of the update and depending on a moveRate 
-        if (choice >= (0.995f + moveRate))
+        // we still waiting 99.9% of the update and depending on a moveRate 
+        if (choice >= (0.999f - moveRate))
         {
             if (Random.Range(0.0f, 100f) < shyness)
             {
@@ -164,8 +169,8 @@ public class AgentManager : MonoBehaviour
     {
         float choice = Random.Range(0.0f, 1.0f);
 
-        // we still eating 99.5% of the update
-        if (choice >= 0.995f)
+        // we still eating 99.8% of the update depending of the hunger as well
+        if (choice >= (0.998f + hunger/100000.0))
         {
             isSeekingForDistance = true;
             MoveAway();
@@ -174,7 +179,6 @@ public class AgentManager : MonoBehaviour
 
     void SelectTable()
     {
-        int TableIndex = 0;
         obstacle.enabled = false;
         agent.enabled = true;
         TableIndex = ClosestTableIndex();
