@@ -21,8 +21,7 @@ public class AgentManager : MonoBehaviour
     public delegate void TalkAction(GameObject talker);
     public static event TalkAction onTalk;
     public  bool hasToWait;
-    public  bool isAtTable;
-    private bool hasCalled;
+    public  bool isAtTable;   
     private bool isSeekingForDistance;
     private float timeToWait;
     private States currentState;
@@ -66,38 +65,37 @@ public class AgentManager : MonoBehaviour
 
     void Update()
     {
-        if(hasToWait)
+        if (hasToWait)
         {
             // In case that the agent must let an other agent pass the way before
             ManageWaiting();
         }
-        else if(isSeekingForDistance)
+        else if (isSeekingForDistance)
         {
             MoveAway();
         }
-        else if(currentState == States.WAITING)
+        else if (currentState == States.WAITING)
         {
             ChooseActionWhileWaiting();
         }
-        else if(currentState == States.EATING)
+        else if (currentState == States.EATING)
         {
             ChooseActionWhileEating();
         }
-        else if(currentState == States.GOINGTOEAT)
+        else if (currentState == States.GOINGTOEAT)
         {
             CheckReachTable();
         }
-        else if(currentState == States.GOINGAWAY)
+        else if (currentState == States.GOINGAWAY)
         {
             CheckReachDest();
         }
-        else if(!hasCalled && (currentState == States.WANTTOTALK))
+        else if (currentState == States.WANTTOTALK)
         {
-            if(onTalk != null)
+            if (onTalk != null)
                 onTalk(this.gameObject);
-            hasCalled = true;
         }
-        else if(currentState == States.WALKINGTOSOMEONE)
+        else if (currentState == States.WALKINGTOSOMEONE)
         {
             CheckReachPerson();
         }
@@ -155,31 +153,40 @@ public class AgentManager : MonoBehaviour
     {
         if (agent.enabled)
         {
-            if (!agent.pathPending && (Mathf.Sqrt(Mathf.Pow(this.gameObject.transform.position.x - personToTalk.transform.position.x 
-                , 2.0f) + Mathf.Pow(this.gameObject.transform.position.z - personToTalk.transform.position.z , 2.0f)) <= 1.0f))
+            if (!agent.pathPending)
             {
-                if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
-                {
-                    animator.SetBool("isWalking", false);
-                    animator.Rebind();
-                    animator.SetBool("isTalking", true);
-                    agent.enabled = false;
-                    obstacle.enabled = true;
-                    currentState = States.TALKING;
-                    Vector3 relativePos = personToTalk.transform.position - this.gameObject.transform.position;
-                    Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
-                    this.gameObject.transform.rotation = rotation;
-
-                    if (!(personToTalk.GetComponent<AgentManager>().currentState == States.TALKING))
+                    if (Mathf.Sqrt(Mathf.Pow(this.gameObject.transform.position.x - personToTalk.transform.position.x
+                    , 2.0f) + Mathf.Pow(this.gameObject.transform.position.z - personToTalk.transform.position.z, 2.0f)) <= 2.0f)
                     {
-                        personToTalk.GetComponent<AgentManager>().animator.SetBool("isWaiting", false);
-                        personToTalk.GetComponent<AgentManager>().animator.SetBool("isTalking", true);
-                        personToTalk.GetComponent<AgentManager>().currentState = States.TALKING;
-                        Vector3 rPos =  this.gameObject.transform.position - personToTalk.transform.position;
-                        Quaternion rot = Quaternion.LookRotation(relativePos, Vector3.up);
-                        personToTalk.transform.rotation = rot;
+                        animator.SetBool("isWalking", false);
+                        animator.Rebind();
+                        animator.SetBool("isTalking", true);
+                        agent.enabled = false;
+                        obstacle.enabled = true;
+                        currentState = States.TALKING;
+                        Vector3 relativePos = personToTalk.transform.position - this.gameObject.transform.position;
+                        Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
+                        this.gameObject.transform.rotation = rotation;
+
+                        if (!(personToTalk.GetComponent<AgentManager>().currentState == States.TALKING))
+                        {
+                            Vector3 rPos = this.gameObject.transform.position - personToTalk.transform.position;
+                            Quaternion rot = Quaternion.LookRotation(rPos, Vector3.up);
+                            personToTalk.transform.rotation = rot;
+                            personToTalk.GetComponent<AgentManager>().animator.SetBool("isWaiting", false);
+                            personToTalk.GetComponent<AgentManager>().animator.SetBool("isTalking", true);
+                            personToTalk.GetComponent<AgentManager>().currentState = States.TALKING;
+                        }
                     }
-                }
+                    else
+                    {
+                        animator.SetBool("isWalking", false);
+                        animator.Rebind();
+                        animator.SetBool("isWaiting", true);
+                        agent.enabled = false;
+                        obstacle.enabled = true;
+                        currentState = States.WAITING;
+                    }
             }
         }
     }
@@ -215,10 +222,7 @@ public class AgentManager : MonoBehaviour
                         }
                     }
                     if (currentState != States.GOINGTOTALK)
-                    {
                         currentState = States.WANTTOTALK;
-                        hasCalled = false;
-                    }
                 }
             }
         }
@@ -270,7 +274,7 @@ public class AgentManager : MonoBehaviour
                 float choice = Random.Range(0.0f, 100.0f);
                 float choice2 = Random.Range(0.0f, 100.0f);
                 
-                if((choice>80.0f) && (choice2>shyness))
+                if((choice>99.99f) && (choice2>shyness))
                 {
                     obstacle.enabled = false;
                     agent.enabled = true;
@@ -290,7 +294,7 @@ public class AgentManager : MonoBehaviour
                 float choice2 = Random.Range(0.0f, 100.0f);
                 float choice3 = Random.Range(0.0f, 100.0f);
 
-                if ((choice3 > 60.0f) && (choice > hunger) && (choice2 > shyness))
+                if ((choice3 > 99.5f) && (choice > hunger) && (choice2 > shyness))
                 {
                     obstacle.enabled = false;
                     agent.enabled = true;

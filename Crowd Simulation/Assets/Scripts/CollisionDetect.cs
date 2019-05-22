@@ -13,7 +13,7 @@ public class CollisionDetect : MonoBehaviour
 
     void Start()
     {
-        fixTimeColliding = Random.Range(1.0f, 5.0f);
+        fixTimeColliding = Random.Range(1.0f, 3.0f);
         timeColliding = fixTimeColliding;
         agent = gameObject.GetComponentInParent<NavMeshAgent>();
         obstacle = gameObject.GetComponentInParent<NavMeshObstacle>();
