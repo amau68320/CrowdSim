@@ -7,12 +7,12 @@ public class AtTableCheck : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         if(other.gameObject.GetComponentInParent<AgentManager>().enabled)
-            other.gameObject.GetComponentInParent<AgentManager>().isAtTable = true;
+            other.gameObject.GetComponentInParent<AgentManager>().SetIsAtTable(true);
     }
 
     void OnTriggerExit(Collider other)
     {
         if (other.gameObject.GetComponentInParent<AgentManager>().enabled)
-            other.gameObject.GetComponentInParent<AgentManager>().isAtTable = false;
+            other.gameObject.GetComponentInParent<AgentManager>().SetIsAtTable(false);
     }
 }

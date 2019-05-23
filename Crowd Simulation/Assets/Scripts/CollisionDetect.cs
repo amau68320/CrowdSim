@@ -48,7 +48,7 @@ public class CollisionDetect : MonoBehaviour
                 timeColliding = fixTimeColliding;
 
                 if (gameObject.GetComponentInParent<AgentManager>().enabled)
-                    gameObject.GetComponentInParent<AgentManager>().hasToWait = true;
+                    gameObject.GetComponentInParent<AgentManager>().SetHasToWait(true);
             }
         }
         else
