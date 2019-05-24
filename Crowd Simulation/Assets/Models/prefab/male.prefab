@@ -253,7 +253,7 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0.5
+  m_StoppingDistance: 0.2
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -331,10 +331,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6821044bceeba154b924451eed6231c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hasToWait: 0
-  isAtTable: 0
   currentState: 0
   personToTalk: {fileID: 0}
+  talkers: []
 --- !u!1 &4746344782556170346
 GameObject:
   m_ObjectHideFlags: 0
