@@ -27,4 +27,10 @@ public class CheckAllEntered : MonoBehaviour
             this.enabled = false;
         }
     }
+
+    public static void OpenDoors()
+    {
+        GameObject.Find("doorP1").transform.Rotate(0, -150, 0, Space.Self);
+        GameObject.Find("doorP1-2").transform.Rotate(0, -150, 0, Space.Self);
+    }
 }

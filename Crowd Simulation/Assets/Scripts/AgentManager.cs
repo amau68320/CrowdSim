@@ -20,11 +20,12 @@ public class AgentManager : MonoBehaviour
 {
     public delegate void TalkAction(GameObject talker);
     public static event TalkAction onTalk;
+
     private  bool hasToWait;
     private  bool isAtTable;
     private bool isSeekingForDistance;
     private float timeToWait;
-    public States currentState;
+    private States currentState;
     private float hunger;
     private float shyness;
     private float moveRate;
@@ -32,12 +33,12 @@ public class AgentManager : MonoBehaviour
     private float zDest;
     private int TableIndex;
     private int TempoEvent;
-    public GameObject personToTalk;
+    private GameObject personToTalk;
     private NavMeshAgent agent;
     private Animator animator;
     private NavMeshObstacle obstacle;
     private int TableNbr;
-    public List<GameObject> talkers;
+    private List<GameObject> talkers;
     private Vector2[] Tables =
     {
         new Vector2(4.0f, -6.5f),
@@ -454,6 +455,17 @@ public class AgentManager : MonoBehaviour
         }
 
         return Index;
+    }
+
+    public void ReactToAlarm()
+    {
+        AgentEvacuation nextScript = GetComponent<AgentEvacuation>();
+        nextScript.enabled = true;
+        nextScript.SetCurrentState(currentState);
+        nextScript.SetHunger(hunger);
+        nextScript.SetShyness(shyness);
+        nextScript.SetMoveRate(moveRate);
+        this.enabled = false;
     }
 
     public void SetIsAtTable(bool atTable)

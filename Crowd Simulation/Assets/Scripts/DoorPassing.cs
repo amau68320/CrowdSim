@@ -6,7 +6,7 @@ public class DoorPassing : MonoBehaviour
 {
     private void OnTriggerExit(Collider perso)
     {
-        if(string.Equals(perso.gameObject.name, "male(Clone)") || string.Equals(perso.gameObject.name, "female(Clone)"))
+        if (string.Equals(perso.gameObject.name, "male(Clone)") || string.Equals(perso.gameObject.name, "female(Clone)"))
             CheckAllEntered.nbrAgentEntered++;
     }
 }
