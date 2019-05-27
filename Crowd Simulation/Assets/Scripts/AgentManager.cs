@@ -206,6 +206,11 @@ public class AgentManager : MonoBehaviour
 
         if((personToTalk.GetComponent<AgentManager>().currentState != States.TALKING) && (personToTalk.GetComponent<AgentManager>().currentState != States.WANTTOTALK))
         {
+            foreach (GameObject ag in talkers)
+            {
+                ag.GetComponent<AgentManager>().talkers.Remove(this.gameObject);
+            }
+            talkers.Clear();
             animator.SetBool("isWalking", false);
             animator.Rebind();
             animator.SetBool("isWaiting", true);
