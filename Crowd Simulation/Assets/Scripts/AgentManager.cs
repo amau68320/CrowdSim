@@ -189,6 +189,7 @@ public class AgentManager : MonoBehaviour
                          Quaternion rot = Quaternion.LookRotation(rPos, Vector3.up);
                          personToTalk.transform.rotation = rot;
                          personToTalk.GetComponent<AgentManager>().animator.SetBool("isWaiting", false);
+                         personToTalk.GetComponent<AgentManager>().animator.Rebind();
                          personToTalk.GetComponent<AgentManager>().animator.SetBool("isTalking", true);
                          personToTalk.GetComponent<AgentManager>().currentState = States.TALKING;
                          foreach (GameObject ag in personToTalk.GetComponent<AgentManager>().talkers)
@@ -265,6 +266,7 @@ public class AgentManager : MonoBehaviour
         if(talkers.Count == 0)
         {
             animator.SetBool("isTalking", false);
+            animator.Rebind();
             animator.SetBool("isWaiting", true);
             currentState = States.WAITING;
         }
@@ -303,8 +305,8 @@ public class AgentManager : MonoBehaviour
     {
         float choice = Random.Range(0.0f, 1.0f);
 
-        // we still eating 99.8% of the update depending of the hunger as well
-        if (choice >= (0.998f + hunger/100000.0f))
+        // we still eating 99.85% of the update depending of the hunger as well
+        if (choice >= (0.9985f + hunger/100000.0f))
         {
             isSeekingForDistance = true;
             MoveAway();
@@ -334,7 +336,7 @@ public class AgentManager : MonoBehaviour
                 float choice = Random.Range(0.0f, 100.0f);
                 float choice2 = Random.Range(0.0f, 100.0f);
                 
-                if((choice>90.0f) && (choice2>shyness))
+                if((choice>95.0f) && (choice2>shyness))
                 {
                     obstacle.enabled = false;
                     agent.enabled = true;
@@ -355,7 +357,7 @@ public class AgentManager : MonoBehaviour
                 float choice2 = Random.Range(0.0f, 100.0f);
                 float choice3 = Random.Range(0.0f, 100.0f);
 
-                if ((choice3 > 80.0f) && (choice > hunger) && (choice2 > shyness))
+                if ((choice3 > 85.0f) && (choice > hunger) && (choice2 > shyness))
                 {
                     obstacle.enabled = false;
                     agent.enabled = true;

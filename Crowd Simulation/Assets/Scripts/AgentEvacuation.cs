@@ -17,7 +17,23 @@ public class AgentEvacuation : MonoBehaviour
 
     void Start()
     {
-        
+        agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
+        obstacle = GetComponent<NavMeshObstacle>();
+        Destroy(this.gameObject.GetComponentInChildren<CollisionDetect>());
+        obstacle.enabled = false;
+        agent.enabled = true;
+        xDest = Random.Range(0, 2) == 0 ? 16.0f : -16.0f;
+        zDest = -1.27f;
+        agent.ResetPath();
+        agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
+        agent.speed = 2.5f;
+        animator.SetBool("isTalking", false);
+        animator.SetBool("isWaiting", false);
+        animator.SetBool("isWalking", false);
+        animator.SetBool("isEating", false);
+        animator.Rebind();
+        animator.SetBool("isRunning", true);
     }
 
     void Update()

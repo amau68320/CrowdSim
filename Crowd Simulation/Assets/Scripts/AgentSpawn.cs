@@ -6,7 +6,7 @@ public class AgentSpawn : MonoBehaviour
 {
     public GameObject male;
     public GameObject female;
-    public float spawnTime = 0.2f;
+    public float spawnTime = 0.3f;
     public static int maxAgentNbr = 80;
     int nbrSpawnedAgents = 0;
     GameObject spawn1;

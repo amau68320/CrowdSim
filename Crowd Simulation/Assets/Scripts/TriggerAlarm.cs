@@ -40,6 +40,7 @@ public class TriggerAlarm : MonoBehaviour
             }
             isActivated = true;
             onAlarm();
+            DoorPassing.isEvacuation = true;
         }
     }
 
