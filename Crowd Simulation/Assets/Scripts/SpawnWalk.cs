@@ -20,6 +20,7 @@ public class SpawnWalk : MonoBehaviour
         obstacle = GetComponent<NavMeshObstacle>();
         animator = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();
+        animator.SetBool("isWalking", true);
         agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
     }
 

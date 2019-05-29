@@ -188,7 +188,7 @@ ModelImporter:
       name: Idle_Stance_1
       takeName: Take 001
       firstFrame: 136
-      lastFrame: 591
+      lastFrame: 137
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
