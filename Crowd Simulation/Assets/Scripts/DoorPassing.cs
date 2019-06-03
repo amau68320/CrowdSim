@@ -20,6 +20,7 @@ public class DoorPassing : MonoBehaviour
 
         if ((string.Equals(perso.gameObject.name, "male(Clone)") || string.Equals(perso.gameObject.name, "female(Clone)")) && isEvacuation)
         {
+            AllAgents.agents.Remove(perso.gameObject);
             Destroy(perso.gameObject);
             TriggerAlarm.nbrAgentsInRoom--;
             spawnedNbr.text = "Number of agents currently spawned : " + TriggerAlarm.nbrAgentsInRoom;

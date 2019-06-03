@@ -53,7 +53,7 @@ public class SpawnWalk : MonoBehaviour
         }
         else if(obstacle.enabled)
         {
-            agent.speed = 1.0f;
+            agent.speed = 0.75f;
             gameObject.GetComponent<AgentManager>().enabled = true;
             this.enabled = false;
         }

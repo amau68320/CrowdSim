@@ -8,9 +8,13 @@ public class TriggerAlarm : MonoBehaviour
     public delegate void AlarmTrigger();
     public static event AlarmTrigger onAlarm;
 
+    public delegate void DoorClose(bool door);
+    public static event DoorClose onClose;
+
     private Renderer[] alarms;
     private bool isRed;
     private bool isActivated;
+    private bool anyDoorClosed;
     private float evacuateTime;
     private Text timeEvacuating;
     public const float blinkTime = 0.3f;
@@ -20,6 +24,7 @@ public class TriggerAlarm : MonoBehaviour
     {
         isRed = false;
         isActivated = false;
+        anyDoorClosed = false;
         evacuateTime = 0.0f;
         alarms = GetComponentsInChildren<Renderer>();
         timeEvacuating = GameObject.Find("EvacuationTime").GetComponent<Text>();
@@ -53,6 +58,31 @@ public class TriggerAlarm : MonoBehaviour
         {
             evacuateTime += Time.deltaTime;
             timeEvacuating.text = "Time for evacuating the room : " + string.Format("{0:0.00}", evacuateTime) + " seconds";
+        }
+
+
+        if((Random.Range(0.0f,100.0f) > 99.95f) && !anyDoorClosed && isActivated)
+        {
+            anyDoorClosed = true;
+            GameObject doorToClose;
+
+            foreach (GameObject ag in AllAgents.agents)
+            {
+                onClose += ag.GetComponent<AgentEvacuation>().reactToDoorClosed;
+            }
+
+            if (Random.Range(0, 2) == 0)
+            {
+                doorToClose = GameObject.Find("doorP1");
+                onClose(true);
+            }
+            else
+            {
+                doorToClose = GameObject.Find("doorP1-2");
+                onClose(false);
+            }
+
+            doorToClose.transform.Rotate(0, 150, 0, Space.Self);
         }
     }
 

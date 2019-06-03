@@ -2442,7 +2442,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   male: {fileID: 4746344782556170344, guid: dadd4db851845934c9d3847a204197be, type: 3}
   female: {fileID: 6752926515786729301, guid: c12d81440a70d3e4fade2b4c8cb6a6c6, type: 3}
-  spawnTime: 0.2
 --- !u!1 &1479607206
 GameObject:
   m_ObjectHideFlags: 0
