@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AgentSpawn : MonoBehaviour
 {
@@ -8,13 +9,15 @@ public class AgentSpawn : MonoBehaviour
     public GameObject female;
     public float spawnTime = 0.3f;
     public static int maxAgentNbr = 80;
-    int nbrSpawnedAgents = 0;
-    GameObject spawn1;
-    GameObject spawn2;
+    private int nbrSpawnedAgents = 0;
+    private GameObject spawn1;
+    private GameObject spawn2;
+    private Text spawnedNbr;
 
     // Start is called before the first frame update
     void Start()
     {
+        spawnedNbr = GameObject.Find("SpawnedAgentsNbr").GetComponent<Text>();
         spawn1 = GameObject.Find("Spawner1");
         spawn2 = GameObject.Find("Spawner2");
         InvokeRepeating("Spawn", 0.1f, spawnTime);
@@ -46,7 +49,9 @@ public class AgentSpawn : MonoBehaviour
             else
                 AllAgents.agents.Add(Instantiate(female, spawn2.transform.position, spawn2.transform.rotation));
         }
-
+        
         nbrSpawnedAgents++;
+
+        spawnedNbr.text = "Number of agents currently spawned : " + nbrSpawnedAgents;
     }
 }

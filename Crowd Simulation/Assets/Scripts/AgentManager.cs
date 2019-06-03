@@ -39,7 +39,7 @@ public class AgentManager : MonoBehaviour
     private NavMeshObstacle obstacle;
     private int TableNbr;
     private List<GameObject> talkers;
-    private Vector2[] Tables =
+    public static Vector2[] Tables =
     {
         new Vector2(4.0f, -6.5f),
         new Vector2(4.0f, 6.9f),

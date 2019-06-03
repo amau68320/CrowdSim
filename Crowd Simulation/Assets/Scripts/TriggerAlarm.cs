@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TriggerAlarm : MonoBehaviour
 {
@@ -10,13 +11,18 @@ public class TriggerAlarm : MonoBehaviour
     private Renderer[] alarms;
     private bool isRed;
     private bool isActivated;
+    private float evacuateTime;
+    private Text timeEvacuating;
     public const float blinkTime = 0.3f;
+    public static int nbrAgentsInRoom = AgentSpawn.maxAgentNbr;
 
     void Start()
     {
         isRed = false;
         isActivated = false;
+        evacuateTime = 0.0f;
         alarms = GetComponentsInChildren<Renderer>();
+        timeEvacuating = GameObject.Find("EvacuationTime").GetComponent<Text>();
         onAlarm += TriggerBlink;
         onAlarm += CheckAllEntered.OpenDoors;
     }
@@ -41,6 +47,12 @@ public class TriggerAlarm : MonoBehaviour
             isActivated = true;
             onAlarm();
             DoorPassing.isEvacuation = true;
+        }
+
+        if((nbrAgentsInRoom > 0) && isActivated)
+        {
+            evacuateTime += Time.deltaTime;
+            timeEvacuating.text = "Time for evacuating the room : " + string.Format("{0:0.00}", evacuateTime) + " seconds";
         }
     }
 
