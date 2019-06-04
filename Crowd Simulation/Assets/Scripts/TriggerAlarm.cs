@@ -68,7 +68,7 @@ public class TriggerAlarm : MonoBehaviour
 
             foreach (GameObject ag in AllAgents.agents)
             {
-                onClose += ag.GetComponent<AgentEvacuation>().reactToDoorClosed;
+                onClose += ag.GetComponent<AgentEvacuation>().ReactToDoorClosed;
             }
 
             if (Random.Range(0, 2) == 0)
