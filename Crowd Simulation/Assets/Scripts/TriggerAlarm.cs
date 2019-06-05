@@ -78,7 +78,7 @@ public class TriggerAlarm : MonoBehaviour
             }
             else
             {
-                doorToClose = GameObject.Find("doorP1-2");
+                doorToClose = GameObject.Find("doorP2");
                 onClose(false);
             }
 

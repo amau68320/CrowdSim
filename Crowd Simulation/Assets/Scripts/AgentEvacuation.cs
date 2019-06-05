@@ -30,7 +30,7 @@ public class AgentEvacuation : MonoBehaviour
     private NavMeshObstacle obstacle;
     private int nbrDoorOpened;
 
-    public static Vector2[] EvacuationDest =
+    public Vector2[] EvacuationDest =
     {
         new Vector2(14.0f, -1.27f),
         new Vector2(-13.5f, -0.2f)
@@ -92,7 +92,7 @@ public class AgentEvacuation : MonoBehaviour
                 {
                     //security to avoid someone to leave the room before deciding to help (or not) someone
                     if (Mathf.Sqrt(Mathf.Pow(ag.transform.position.x - ag.GetComponent<NavMeshAgent>().destination.x
-                        , 2.0f) + Mathf.Pow(ag.transform.position.z - ag.GetComponent<NavMeshAgent>().destination.z, 2.0f)) <= 6.0f)
+                        , 2.0f) + Mathf.Pow(ag.transform.position.z - ag.GetComponent<NavMeshAgent>().destination.z, 2.0f)) >= 3.0f)
                     {
                         onAskHelp += ag.GetComponent<AgentEvacuation>().ChooseToHelp;
                     }
@@ -136,7 +136,7 @@ public class AgentEvacuation : MonoBehaviour
             xDest = Random.Range(-10.7f, 9.7f);
             zDest = Random.Range(-6.7f, 6.7f);
             isInPanic = true;
-            timeBeforeASkingHelp = Random.Range(6.0f, 10.0f) + (shyness / 20.0f);
+            timeBeforeASkingHelp = Random.Range(2.0f, 6.0f) + (shyness / 20.0f);
         }
         else
         {
@@ -164,6 +164,8 @@ public class AgentEvacuation : MonoBehaviour
 
         if (decontracteness < 75.0f)
             agent.speed = 2.5f - (hunger / 200.0f) - (shyness / 200.0f) + (moveRate * 1000.0f);
+        else
+            agent.speed = 1.2f;
 
         hasThought = true;
     }
@@ -231,8 +233,8 @@ public class AgentEvacuation : MonoBehaviour
     {
         if (agent.enabled && !agent.pathPending)
         {
-            if (Mathf.Sqrt(Mathf.Pow(this.gameObject.transform.position.x - personHelped.transform.position.x
-                , 2.0f) + Mathf.Pow(this.gameObject.transform.position.z - personHelped.transform.position.z, 2.0f)) <= 1.0f)
+            if (Mathf.Sqrt(Mathf.Pow(this.gameObject.transform.position.x - xDest
+                , 2.0f) + Mathf.Pow(this.gameObject.transform.position.z - zDest, 2.0f)) <= 1.0f)
             {
                 AgentEvacuation script = personHelped.GetComponent<AgentEvacuation>();
                 int index = ClosestDoorIndex();
@@ -260,7 +262,10 @@ public class AgentEvacuation : MonoBehaviour
         float destX = whichDoor ? EvacuationDest[0].x : EvacuationDest[1].x;
 
         if (whichDoor)
-            EvacuationDest[0] = EvacuationDest[1];
+        {
+            EvacuationDest[0].x = EvacuationDest[1].x;
+            EvacuationDest[0].y = EvacuationDest[1].y;
+        }
 
         if (agent.enabled && (agent.destination.x == destX))
         {
@@ -279,17 +284,17 @@ public class AgentEvacuation : MonoBehaviour
 
     public void ChooseToHelp(GameObject personToHelp)
     {
-        if (personToHelp.GetComponent<AgentEvacuation>().isHelped || isGoingToHelp)
+        if (this == null || personToHelp.GetComponent<AgentEvacuation>().isHelped || isGoingToHelp)
             return;
 
-        float distance = Mathf.Sqrt(Mathf.Pow(this.gameObject.transform.position.x - personToHelp.transform.position.x
-                         , 2.0f) + Mathf.Pow(this.gameObject.transform.position.z - personToHelp.transform.position.z, 2.0f));
+        float distance = Mathf.Sqrt(Mathf.Pow(gameObject.transform.position.x - personToHelp.transform.position.x
+                         , 2.0f) + Mathf.Pow(gameObject.transform.position.z - personToHelp.transform.position.z, 2.0f));
 
-        if((helpness - distance) >= 50.0f)
+        if(((helpness - distance) >= 50.0f) && !personToHelp.GetComponent<AgentEvacuation>().isHelped)
         {
             personToHelp.GetComponent<AgentEvacuation>().isHelped = true;
-            personHelped = personToHelp;
             isGoingToHelp = true;
+            personHelped = personToHelp;
             obstacle.enabled = false;
             agent.enabled = true;
             animator.SetBool("isWaiting", false);

@@ -20,7 +20,7 @@ public class CheckAllEntered : MonoBehaviour
         if(waitTime<=0)
         {
             GameObject.Find("doorP1").transform.Rotate(0, 150, 0, Space.Self);
-            GameObject.Find("doorP1-2").transform.Rotate(0, 150, 0, Space.Self);
+            GameObject.Find("doorP2").transform.Rotate(0, 150, 0, Space.Self);
             nbrAgentEntered = 0;
             waitTime = 5.0f;
 
@@ -31,6 +31,6 @@ public class CheckAllEntered : MonoBehaviour
     public static void OpenDoors()
     {
         GameObject.Find("doorP1").transform.Rotate(0, -150, 0, Space.Self);
-        GameObject.Find("doorP1-2").transform.Rotate(0, -150, 0, Space.Self);
+        GameObject.Find("doorP2").transform.Rotate(0, -150, 0, Space.Self);
     }
 }

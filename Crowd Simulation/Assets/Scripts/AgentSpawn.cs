@@ -7,7 +7,7 @@ public class AgentSpawn : MonoBehaviour
 {
     public GameObject male;
     public GameObject female;
-    public const float spawnTime = 0.5f;
+    public const float spawnTime = 0.3f;
     public static int maxAgentNbr = 80;
     private int nbrSpawnedAgents = 0;
     private GameObject spawn1;
@@ -18,6 +18,7 @@ public class AgentSpawn : MonoBehaviour
     void Start()
     {
         spawnedNbr = GameObject.Find("SpawnedAgentsNbr").GetComponent<Text>();
+        GameObject.Find("MaxAgentsNbr").GetComponent<Text>().text = "Total number of agents in the simulation : " + maxAgentNbr;
         spawn1 = GameObject.Find("Spawner1");
         spawn2 = GameObject.Find("Spawner2");
         InvokeRepeating("Spawn", 0.1f, spawnTime);
