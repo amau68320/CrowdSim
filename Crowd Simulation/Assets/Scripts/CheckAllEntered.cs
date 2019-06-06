@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// This script checks if every agent is entered inside the Room and after that it waits 5 seconds to close the doors 
 public class CheckAllEntered : MonoBehaviour
 {
     GameObject trigger1;
@@ -28,6 +29,7 @@ public class CheckAllEntered : MonoBehaviour
         }
     }
 
+    // Called for evacuation
     public static void OpenDoors()
     {
         GameObject.Find("doorP1").transform.Rotate(0, -150, 0, Space.Self);

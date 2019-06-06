@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+// This script manages the start menu
 public class MenuManager : MonoBehaviour
 {
     private const int minNbr = 10;

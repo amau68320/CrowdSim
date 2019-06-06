@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+// different states during reception
 public enum States
 {
     WAITING = 0,
@@ -15,7 +16,7 @@ public enum States
     WALKINGTOSOMEONE = 7
 }
 
-// the agent behavior during the party will be managed by a state machine
+// the agent behavior during the reception will be managed by a state machine
 public class AgentManager : MonoBehaviour
 {
     public delegate void TalkAction(GameObject talker);
@@ -48,27 +49,27 @@ public class AgentManager : MonoBehaviour
         new Vector2(0.0f, 0.65f)
     };
 
-    void Start()
+    private void Start()
     {
         TableNbr = 5;
         TableIndex = 0;
-        TempoEvent = 50;
+        TempoEvent = 50; 
         hasToWait = false;
         isAtTable = false;
         isSeekingForDistance = false;
         currentState = States.WAITING;
-        timeToWait = 3.0f;
+        timeToWait = 3.0f; // the time to wait after a "colision" is detected by the security triggered GameObject
         talkers = new List<GameObject>();
         obstacle = GetComponent<NavMeshObstacle>();
         animator = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();
-        hunger = Random.Range(0.0f, 100.0f);
-        shyness = Random.Range(0.0f, 100.0f);
-        moveRate = Random.Range(0.0f, 0.001f);
+        hunger = Random.Range(0.0f, 100.0f); // define the hunger
+        shyness = Random.Range(0.0f, 100.0f); // define the shyness (100 : very shy, 0 : sociable)
+        moveRate = Random.Range(0.0f, 0.001f); // define the probability that the agent will move often 
         onTalk += ChooseToTalk;
     }
 
-    void Update()
+    private void Update()
     {
         if (hasToWait)
         {
@@ -115,7 +116,7 @@ public class AgentManager : MonoBehaviour
         }
     }
 
-    void CheckReachTable()
+    private void CheckReachTable()
     {
         if(isAtTable)
         {
@@ -144,7 +145,7 @@ public class AgentManager : MonoBehaviour
         }
     }
 
-    void CheckReachDest()
+    private void CheckReachDest()
     {
         if (agent.enabled)
         {
@@ -163,14 +164,13 @@ public class AgentManager : MonoBehaviour
         }
     }
 
-    void CheckReachPerson()
+    private void CheckReachPerson()
     {
         if (agent.enabled)
         {
             if (!agent.pathPending)
             {
-                if (Mathf.Sqrt(Mathf.Pow(this.gameObject.transform.position.x - personToTalk.transform.position.x
-                    , 2.0f) + Mathf.Pow(this.gameObject.transform.position.z - personToTalk.transform.position.z, 2.0f)) <= 1.0f)
+                if (AgentEvacuation.CalculateDistanceSquare(gameObject.transform.position, personToTalk.transform.position) <= 1.0f)
                 {
                      animator.SetBool("isWalking", false);
                      animator.Rebind();
@@ -182,7 +182,7 @@ public class AgentManager : MonoBehaviour
                      Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
                      this.gameObject.transform.rotation = rotation;
 
-
+                    // if this agent is the first to reach the person who wants to talk, it triggers the state and animation 
                      if (personToTalk.GetComponent<AgentManager>().currentState != States.TALKING)
                      {
                          Vector3 rPos = this.gameObject.transform.position - personToTalk.transform.position;
@@ -222,7 +222,7 @@ public class AgentManager : MonoBehaviour
         }
     }
 
-    void ChooseActionWhileWaiting()
+    private void ChooseActionWhileWaiting()
     {
         float choice = Random.Range(0.0f, 1.0f);
 
@@ -261,7 +261,7 @@ public class AgentManager : MonoBehaviour
         }
     }
 
-    void ChooseActionWhileTalking()
+    private void ChooseActionWhileTalking()
     {
         if(talkers.Count == 0)
         {
@@ -301,7 +301,7 @@ public class AgentManager : MonoBehaviour
         }
     }
 
-    void ChooseActionWhileEating()
+    private void ChooseActionWhileEating()
     {
         float choice = Random.Range(0.0f, 1.0f);
 
@@ -313,8 +313,11 @@ public class AgentManager : MonoBehaviour
         }
     }
 
-    void ChooseToTalk(GameObject talker)
+    // this method is called when event "onTalk" is catched 
+    private void ChooseToTalk(GameObject talker)
     {
+        // the conversation can be with max 4 other peoples 
+        // the choice to talk depends on the current state and on shyness and a random variable choice inside the method 
         if((currentState != States.WANTTOTALK) && (talker.GetComponent<AgentManager>().talkers.Count < 4))
         {
             if(currentState == States.GOINGTOTALK)
@@ -375,7 +378,8 @@ public class AgentManager : MonoBehaviour
         }
     }
 
-    void SelectTable()
+    // When agent wants to eat, select a table and set it as destination
+    private void SelectTable()
     {
         obstacle.enabled = false;
         agent.enabled = true;
@@ -390,7 +394,8 @@ public class AgentManager : MonoBehaviour
         animator.SetBool("isWalking", true);
     }
 
-    void ManageWaiting()
+    // if agent has to wait because of a collision is detected by security trigger 
+    private void ManageWaiting()
     {
         if (timeToWait <= 0.0f)
         {
@@ -408,7 +413,7 @@ public class AgentManager : MonoBehaviour
         }
     }
 
-    void MoveAway()
+    private void MoveAway()
     {
         float minDist = float.MaxValue;
         float tmp;
@@ -418,13 +423,14 @@ public class AgentManager : MonoBehaviour
 
         foreach (GameObject ag in AllAgents.agents)
         {
-            tmp = Mathf.Sqrt(Mathf.Pow(ag.transform.position.x - xDest, 2.0f) + Mathf.Pow(ag.transform.position.z - zDest, 2.0f));
+            tmp = AgentEvacuation.CalculateDistanceSquare(ag.transform.position, new Vector3(xDest, 0.0f, zDest));
 
             if (tmp < minDist)
                 minDist = tmp;
         }
 
-        if (minDist >= 1.5f)
+        //distance must be greater than 1.5f
+        if (minDist >= 2.25f)
         {
             isSeekingForDistance = false;
             obstacle.enabled = false;
@@ -439,15 +445,15 @@ public class AgentManager : MonoBehaviour
         }
     }
 
-    int ClosestTableIndex()
+    // Choose the closest table
+    private int ClosestTableIndex()
     {
         int Index = 0;
         float MinDistance = float.MaxValue;
         float tmp;
         for(int i = 0;i<TableNbr;i++)
         {
-            tmp = Mathf.Sqrt(Mathf.Pow(this.gameObject.transform.position.x - Tables[i].x, 2) +
-                          Mathf.Pow(this.gameObject.transform.position.z - Tables[i].y, 2));
+            tmp = AgentEvacuation.CalculateDistanceSquare(gameObject.transform.position, new Vector3(Tables[i].x, 0.0f, Tables[i].y));
 
             if (MinDistance > tmp)
             {
@@ -459,6 +465,8 @@ public class AgentManager : MonoBehaviour
         return Index;
     }
 
+    // declenched by catching event "onAlarm", turn off this script and turn on the AgentEvacuation script to manage evacuation
+    // give some useful variables to AgentEvacuation script as well
     public void ReactToAlarm()
     {
         AgentEvacuation nextScript = GetComponent<AgentEvacuation>();

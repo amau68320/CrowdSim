@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+// This script manage a invisible trigger objet that allows a security during enter and reception
+// In fact, the agents don't detect other active agents ("the ones who walk") so this script allows them to let the other walk by stopping the agent
 public class CollisionDetect : MonoBehaviour
 {
     public bool isInFront = false;
@@ -11,14 +13,15 @@ public class CollisionDetect : MonoBehaviour
     private NavMeshAgent agent;
     private NavMeshObstacle obstacle;
 
-    void Start()
+    private void Start()
     {
+        // agent own time to decide to let an other agent walk
         fixTimeColliding = Random.Range(0.5f, 2.0f);
         timeColliding = fixTimeColliding;
         agent = gameObject.GetComponentInParent<NavMeshAgent>();
         obstacle = gameObject.GetComponentInParent<NavMeshObstacle>();
     }
-    void OnTriggerEnter(Collider character)
+    private void OnTriggerEnter(Collider character)
     {
         isInFront = true;
     }
@@ -28,7 +31,7 @@ public class CollisionDetect : MonoBehaviour
         isInFront = false;
     }
 
-    void Update()
+    private void Update()
     {
         if(!obstacle.enabled)
         {
@@ -48,7 +51,7 @@ public class CollisionDetect : MonoBehaviour
                 timeColliding = fixTimeColliding;
 
                 if (gameObject.GetComponentInParent<AgentManager>().enabled)
-                    gameObject.GetComponentInParent<AgentManager>().SetHasToWait(true);
+                    gameObject.GetComponentInParent<AgentManager>().SetHasToWait(true); // notify the agent that he must wait a time defined in AgentManager.cs before going back to its activity
             }
         }
         else

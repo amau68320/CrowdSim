@@ -28,6 +28,7 @@ public class CameraManager : MonoBehaviour
         RotateCamera(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), arrowMouseSpeed);
     }
 
+    // change position with ZQSD keyboard touches 
     void MoveCamera()
     {
         if (Input.GetKey(KeyCode.D))
@@ -48,6 +49,7 @@ public class CameraManager : MonoBehaviour
         }
     }
 
+    // Change orientation with mouse 
     void RotateCamera(float horizontal, float verticle, float moveSpeed)
     {
         mouseX = horizontal;

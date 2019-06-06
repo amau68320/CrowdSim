@@ -15,7 +15,7 @@ public class AgentSpawn : MonoBehaviour
     private Text spawnedNbr;
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         spawnedNbr = GameObject.Find("SpawnedAgentsNbr").GetComponent<Text>();
         GameObject.Find("MaxAgentsNbr").GetComponent<Text>().text = "Total number of agents in the simulation : " + maxAgentNbr;
@@ -24,7 +24,7 @@ public class AgentSpawn : MonoBehaviour
         InvokeRepeating("Spawn", 0.1f, spawnTime);
     }
 
-    void Spawn()
+    private void Spawn()
     {
         if (nbrSpawnedAgents >= maxAgentNbr)
         {

@@ -39,10 +39,10 @@ public class AgentEvacuation : MonoBehaviour
         new Vector2(-13.5f, -0.2f)
     };
 
-    void Start()
+    private void Start()
     {
-        decontracteness = Random.Range(0.0f, 100.0f);
-        helpness = Random.Range(0.0f, 100.0f);
+        decontracteness = Random.Range(0.0f, 100.0f); // decontractness determines the level of panic (close to 100 : no panic, close to 0 : panic a lot)
+        helpness = Random.Range(0.0f, 100.0f);// helpness determines the probability that this agent helps an other in trouble
         nbrDoorOpened = 2;
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
@@ -58,9 +58,9 @@ public class AgentEvacuation : MonoBehaviour
         DeterminateTimeReacting();
     }
 
-    void Update()
+    private void Update()
     {
-        if (timeEating <= 0.0f)
+        if (timeEating <= 0.0f) // agents that are eating can continue eat some seconds after the alarm was triggered
         {
             if (!hasStartedThinking)
             {
@@ -76,7 +76,7 @@ public class AgentEvacuation : MonoBehaviour
 
             timeThinking -= Time.deltaTime;
 
-            if ((timeThinking <= 0) && !hasThought)
+            if ((timeThinking <= 0) && !hasThought) // the agents have "a bug moment" after the alarm is triggered (the reaction time) 
             {
                 StartEvacuating();
             }
@@ -86,7 +86,7 @@ public class AgentEvacuation : MonoBehaviour
             timeEating -= Time.deltaTime;
         }
 
-        if (isInPanic && !hasCalledHelp)
+        if (isInPanic && !hasCalledHelp) // if the agent is in panic situation
         {
             timeBeforeASkingHelp -= Time.deltaTime;
 
@@ -95,9 +95,8 @@ public class AgentEvacuation : MonoBehaviour
                 hasCalledHelp = true;
                 foreach (GameObject ag in AllAgents.agents)
                 {
-                    //security to avoid someone to leave the room before deciding to help (or not) someone
-                    if (Mathf.Sqrt(Mathf.Pow(ag.transform.position.x - ag.GetComponent<NavMeshAgent>().destination.x
-                        , 2.0f) + Mathf.Pow(ag.transform.position.z - ag.GetComponent<NavMeshAgent>().destination.z, 2.0f)) >= 3.0f)
+                    //security to avoid someone to leave the room before deciding to help (or not) someone, the real distance is  3.0f because we use square distance
+                    if (CalculateDistanceSquare(ag.transform.position, ag.GetComponent<NavMeshAgent>().destination) >= 9.0f)
                     {
                         onAskHelp += ag.GetComponent<AgentEvacuation>().ChooseToHelp;
                     }
@@ -107,21 +106,21 @@ public class AgentEvacuation : MonoBehaviour
             }
         }
 
-        if(isGoingToHelp)
+        if(isGoingToHelp) // if the agent decide to help an other one in trouble
         {
             CheckReachPersonToHelp();
         }
     }
 
-    int ClosestDoorIndex()
+    // return the closest door index near the agent (basically return 0 if a door is closed) 
+    private int ClosestDoorIndex()
     {
         int Index = 0;
         float MinDistance = float.MaxValue;
         float tmp;
         for (int i = 0; i < nbrDoorOpened; i++)
         {
-            tmp = Mathf.Sqrt(Mathf.Pow(this.gameObject.transform.position.x - EvacuationDest[i].x, 2) +
-                          Mathf.Pow(this.gameObject.transform.position.z - EvacuationDest[i].y, 2));
+            tmp = CalculateDistanceSquare(gameObject.transform.position, new Vector3(EvacuationDest[i].x, 0.0f, EvacuationDest[i].y)); 
 
             if (MinDistance > tmp)
             {
@@ -133,7 +132,8 @@ public class AgentEvacuation : MonoBehaviour
         return Index;
     }
 
-    void StartEvacuating()
+    // choose to run or walk depending on decontractness and choose if agent is in panic or not (in panic agent can't reach a door) 
+    private void StartEvacuating()
     {
         if (decontracteness <= 2.0f)
         {
@@ -167,14 +167,15 @@ public class AgentEvacuation : MonoBehaviour
         agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
 
         if (decontracteness < 75.0f)
-            agent.speed = 2.5f - (hunger / 200.0f) - (shyness / 200.0f) + (moveRate * 1000.0f);
+            agent.speed = 2.5f - (hunger / 200.0f) - (shyness / 200.0f) + (moveRate * 1000.0f); // speed depends on shyness, hunger and moveRate
         else
-            agent.speed = 1.2f;
+            agent.speed = 1.2f; // same speed as enter for walking agents
 
         hasThought = true;
     }
 
-    void DeterminateTimeReacting()
+    // The time reaction depends on the state during reception
+    private void DeterminateTimeReacting()
     {
         timeThinking = Random.Range(3.0f, 8.0f);
         timeEating = 0.0f;
@@ -202,7 +203,8 @@ public class AgentEvacuation : MonoBehaviour
         }
     }
 
-    bool CheckAndChangePanicDest()
+    // Agents that are in panic have a time to stop running and ask help, while this time is not under 0 agents still runnings to random destination 
+    private bool CheckAndChangePanicDest()
     {
         if (agent.enabled && !agent.pathPending)
         {
@@ -216,7 +218,7 @@ public class AgentEvacuation : MonoBehaviour
                         animator.Rebind();
                         animator.SetBool("isInPanic", true);
                         agent.enabled = false;
-                        obstacle.enabled = false;
+                        obstacle.enabled = true;
                         return true;
                     }
                     else
@@ -233,12 +235,13 @@ public class AgentEvacuation : MonoBehaviour
         return false;
     }
 
-    void CheckReachPersonToHelp()
+    // When an agent wants to help another, it has to check if it reachs this other agent
+    private void CheckReachPersonToHelp()
     {
         if (agent.enabled && !agent.pathPending)
         {
-            if (Mathf.Sqrt(Mathf.Pow(this.gameObject.transform.position.x - xDest
-                , 2.0f) + Mathf.Pow(this.gameObject.transform.position.z - zDest, 2.0f)) <= 1.0f)
+            // we check if the agent is near of the agent to help but not at the exact position (we don't want a colision) 
+            if (CalculateDistanceSquare(gameObject.transform.position, new Vector3(xDest, 0.0f, zDest)) <= 1.0f)
             {
                 AgentEvacuation script = personHelped.GetComponent<AgentEvacuation>();
                 script.hasCalledHelp = false;
@@ -260,11 +263,13 @@ public class AgentEvacuation : MonoBehaviour
         }
     }
 
+    // reaction to the event "onCloseDoor"
     public void ReactToDoorClosed(bool whichDoor)
     {
+        // we simply say : there is only one door opened and it's at the index 0 
         nbrDoorOpened--;
 
-        float destX = whichDoor ? EvacuationDest[0].x : EvacuationDest[1].x;
+        float destX = whichDoor ? EvacuationDest[0].x : EvacuationDest[1].x; 
 
         if (whichDoor)
         {
@@ -272,7 +277,8 @@ public class AgentEvacuation : MonoBehaviour
             EvacuationDest[0].y = EvacuationDest[1].y;
         }
 
-        if (agent.enabled && (agent.destination.x == destX))
+        // the agents who were going to the closed door have a "bug time", they think about what they should do and after this time they decide to go to the other door (or panic)
+        if (agent.enabled && (agent.destination.x == destX)) 
         {
             agent.enabled = false;
             obstacle.enabled = true;
@@ -287,15 +293,17 @@ public class AgentEvacuation : MonoBehaviour
         decontracteness -= 15.0f;
     }
 
+    // react to the event "OnASkHelp"
     public void ChooseToHelp(GameObject personToHelp)
     {
         if (this == null || personToHelp.GetComponent<AgentEvacuation>().isHelped || isGoingToHelp)
             return;
 
-        float distance = Mathf.Sqrt(Mathf.Pow(gameObject.transform.position.x - personToHelp.transform.position.x
-                         , 2.0f) + Mathf.Pow(gameObject.transform.position.z - personToHelp.transform.position.z, 2.0f));
+        // we take Sqrt in this case because we want the real position
+        float distance = Mathf.Sqrt(CalculateDistanceSquare(gameObject.transform.position, personToHelp.transform.position)); 
 
-        if(((helpness - distance) >= 50.0f) && !personToHelp.GetComponent<AgentEvacuation>().isHelped)
+        // help an agent depend on distance and helpness, the check of "isHelped" is just a security 
+        if(((helpness - distance) >= 50.0f) && !personToHelp.GetComponent<AgentEvacuation>().isHelped) 
         {
             personToHelp.GetComponent<AgentEvacuation>().isHelped = true;
             isGoingToHelp = true;
@@ -342,5 +350,12 @@ public class AgentEvacuation : MonoBehaviour
     public static void ResetOnAskHelp()
     {
         onAskHelp = null;
+    }
+
+    // calculate square distance between 2 Vector3 (more optimised than doing the sqrt that gives the real distance), we only need to calculate 2D distance here
+    // because agents evolve on a 2D grid (on X and Z axes) 
+    public static float CalculateDistanceSquare(Vector3 a, Vector3 b)
+    {
+        return (a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z);
     }
 }

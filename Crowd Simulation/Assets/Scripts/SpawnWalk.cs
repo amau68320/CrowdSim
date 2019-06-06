@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI; 
 
-// This script manage the spawn and walk inside the room for each agent
+// This script manages the spawn and walk inside the room for each agent
 public class SpawnWalk : MonoBehaviour
 {
     private NavMeshAgent agent;
