@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI; 
 
+// This script manage the spawn and walk inside the room for each agent
 public class SpawnWalk : MonoBehaviour
 {
     private NavMeshAgent agent;
@@ -11,8 +12,8 @@ public class SpawnWalk : MonoBehaviour
     private float xDest;
     private float zDest;
 
-    // for Initialization
-    void Awake()
+    // At initialization all agents walk to a random destionation inside the room
+    private void Awake()
     {
         xDest = Random.Range(-10.5f, 9.5f);
         zDest = Random.Range(-6.5f, 6.5f);
@@ -24,9 +25,9 @@ public class SpawnWalk : MonoBehaviour
         agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
     }
 
-    void Update()
+   private void Update()
     {
-        // has reach its final position test
+        // has reach its destination position test
         if (agent.enabled && !agent.pathPending)
         {
             if (agent.remainingDistance <= agent.stoppingDistance)
@@ -42,6 +43,7 @@ public class SpawnWalk : MonoBehaviour
             }
         }
 
+        // In case agent stop outside the room (because of the security collider) 
         if(obstacle.enabled && ((this.gameObject.transform.position.x < -10.7f) || (this.gameObject.transform.position.x > 9.7f) || (this.gameObject.transform.position.z <-6.7f) || (this.gameObject.transform.position.z > 6.7f)))
         {
             animator.SetBool("isWaiting", false);
@@ -54,7 +56,7 @@ public class SpawnWalk : MonoBehaviour
         else if(obstacle.enabled)
         {
             agent.speed = 0.75f;
-            gameObject.GetComponent<AgentManager>().enabled = true;
+            gameObject.GetComponent<AgentManager>().enabled = true; // we stop this script and activate the reception manager script
             this.enabled = false;
         }
     }

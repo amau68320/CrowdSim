@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+// This script manage the Evacuation for each agent
 public class AgentEvacuation : MonoBehaviour
 {
     public delegate void AskHelp(GameObject personToHelp);
@@ -24,12 +25,14 @@ public class AgentEvacuation : MonoBehaviour
     private bool isInPanic;
     private bool isHelped;
     private bool isGoingToHelp;
+    private bool hasCalledHelp;
     private GameObject personHelped;
     private NavMeshAgent agent;
     private Animator animator;
     private NavMeshObstacle obstacle;
     private int nbrDoorOpened;
 
+    // The two "outside" possible destinations, if you add other doors for leaving you'll have to add coordinates here 
     public Vector2[] EvacuationDest =
     {
         new Vector2(14.0f, -1.27f),
@@ -44,12 +47,13 @@ public class AgentEvacuation : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         obstacle = GetComponent<NavMeshObstacle>();
-        Destroy(this.gameObject.GetComponentInChildren<CollisionDetect>());
+        Destroy(this.gameObject.GetComponentInChildren<CollisionDetect>()); // we don't have to check if agents are blocking each other during the evacuation because they all move
         hasThought = false;
         hasStartedThinking = false;
         isInPanic = false;
         isHelped = false;
         isGoingToHelp = false;
+        hasCalledHelp = false;
 
         DeterminateTimeReacting();
     }
@@ -82,13 +86,14 @@ public class AgentEvacuation : MonoBehaviour
             timeEating -= Time.deltaTime;
         }
 
-        if(isInPanic)
+        if (isInPanic && !hasCalledHelp)
         {
             timeBeforeASkingHelp -= Time.deltaTime;
 
-            if(CheckAndChangePanicDest())
+            if (CheckAndChangePanicDest())
             {
-                foreach(GameObject ag in AllAgents.agents)
+                hasCalledHelp = true;
+                foreach (GameObject ag in AllAgents.agents)
                 {
                     //security to avoid someone to leave the room before deciding to help (or not) someone
                     if (Mathf.Sqrt(Mathf.Pow(ag.transform.position.x - ag.GetComponent<NavMeshAgent>().destination.x
@@ -98,8 +103,7 @@ public class AgentEvacuation : MonoBehaviour
                     }
                 }
 
-                onAskHelp(this.gameObject);
-                isInPanic = false;
+                onAskHelp(this.gameObject); // send an event to every agents (that are not too close of the door)
             }
         }
 
@@ -237,6 +241,7 @@ public class AgentEvacuation : MonoBehaviour
                 , 2.0f) + Mathf.Pow(this.gameObject.transform.position.z - zDest, 2.0f)) <= 1.0f)
             {
                 AgentEvacuation script = personHelped.GetComponent<AgentEvacuation>();
+                script.hasCalledHelp = false;
                 int index = ClosestDoorIndex();
                 xDest = EvacuationDest[index].x;
                 zDest = EvacuationDest[index].y;
@@ -327,5 +332,15 @@ public class AgentEvacuation : MonoBehaviour
     public void SetMoveRate(float move)
     {
         moveRate = move;
+    }
+
+    public bool HasCalledHelp()
+    {
+        return hasCalledHelp;
+    }
+
+    public static void ResetOnAskHelp()
+    {
+        onAskHelp = null;
     }
 }

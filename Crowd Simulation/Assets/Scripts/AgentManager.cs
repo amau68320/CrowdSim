@@ -479,4 +479,9 @@ public class AgentManager : MonoBehaviour
     {
         hasToWait = toWait;
     }
+
+    public static void ResetOnTalk()
+    {
+        onTalk = null;
+    }
 }

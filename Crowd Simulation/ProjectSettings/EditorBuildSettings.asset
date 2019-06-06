@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Simulation.unity
     guid: e0947b9d6186c2b4ea9f37f5c002c6ee
+  - enabled: 1
+    path: Assets/Scenes/EndMenu.unity
+    guid: 2924496f12aa2ec47ab7d4482fc2054c
   m_configObjects: {}

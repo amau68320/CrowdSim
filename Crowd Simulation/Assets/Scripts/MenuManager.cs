@@ -9,13 +9,24 @@ public class MenuManager : MonoBehaviour
     private const int minNbr = 10;
     private const int maxNbr = 80;
     private int old;
+    private int nbrAgents;
 
     void Start()
     {
         old = 80;
+        nbrAgents = 80;
     }
     public void Play()
     {
+        // we reset the static variables (it's useful when we restart the simulation)
+        AgentSpawn.maxAgentNbr = nbrAgents;
+        DoorPassing.isEvacuation = false;
+        AgentManager.ResetOnTalk();
+        AgentEvacuation.ResetOnAskHelp();
+        TriggerAlarm.ResetOnAlarm();
+        TriggerAlarm.ResetOnClose();
+        TriggerAlarm.nbrAgentsInRoom = AgentSpawn.maxAgentNbr;
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 
@@ -26,17 +37,18 @@ public class MenuManager : MonoBehaviour
 
     public void ModifyAgentNbr()
     {
-        if (!int.TryParse(GameObject.Find("NbrAgents").GetComponent<InputField>().text, out AgentSpawn.maxAgentNbr))
+        // Check if we enter a correct number of agents 
+        if (!int.TryParse(GameObject.Find("NbrAgents").GetComponent<InputField>().text, out nbrAgents))
         {
-            AgentSpawn.maxAgentNbr = old;
+            nbrAgents = old;
             GameObject.Find("NbrAgents").GetComponent<InputField>().text = old.ToString();
         }
-        else if ((AgentSpawn.maxAgentNbr < minNbr) || (AgentSpawn.maxAgentNbr > maxNbr))
+        else if ((nbrAgents < minNbr) || (nbrAgents > maxNbr))
         {
-            AgentSpawn.maxAgentNbr = old;
+            nbrAgents = old;
             GameObject.Find("NbrAgents").GetComponent<InputField>().text = old.ToString();
         }
         else
-            old = AgentSpawn.maxAgentNbr;
+            old = nbrAgents;
     }
 }
