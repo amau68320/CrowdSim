@@ -243,22 +243,27 @@ public class AgentEvacuation : MonoBehaviour
             // we check if the agent is near of the agent to help but not at the exact position (we don't want a colision) 
             if (CalculateDistanceSquare(gameObject.transform.position, new Vector3(xDest, 0.0f, zDest)) <= 1.0f)
             {
-                AgentEvacuation script = personHelped.GetComponent<AgentEvacuation>();
-                script.hasCalledHelp = false;
                 int index = ClosestDoorIndex();
                 xDest = EvacuationDest[index].x;
                 zDest = EvacuationDest[index].y;
-                script.xDest = xDest;
-                script.zDest = zDest;
-                script.animator.SetBool("isInPanic", false);
-                script.animator.Rebind();
-                script.animator.SetBool("isRunning", true);
-                script.obstacle.enabled = false;
-                script.agent.enabled = true;
                 agent.ResetPath();
                 agent.SetDestination(new Vector3(xDest, this.gameObject.transform.position.y, zDest));
-                script.agent.SetDestination(new Vector3(script.xDest, script.gameObject.transform.position.y, script.zDest));
                 isGoingToHelp = false;
+
+                // security but should never happend 
+                if (personHelped != null)
+                { 
+                    AgentEvacuation script = personHelped.GetComponent<AgentEvacuation>();
+                    script.hasCalledHelp = false;
+                    script.xDest = xDest;
+                    script.zDest = zDest;
+                    script.animator.SetBool("isInPanic", false);
+                    script.animator.Rebind();
+                    script.animator.SetBool("isRunning", true);
+                    script.obstacle.enabled = false;
+                    script.agent.enabled = true;
+                    script.agent.SetDestination(new Vector3(script.xDest, script.gameObject.transform.position.y, script.zDest));
+                }
             }
         }
     }
