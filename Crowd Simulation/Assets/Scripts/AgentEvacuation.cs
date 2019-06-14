@@ -301,7 +301,7 @@ public class AgentEvacuation : MonoBehaviour
     // react to the event "OnASkHelp"
     public void ChooseToHelp(GameObject personToHelp)
     {
-        if (this == null || personToHelp.GetComponent<AgentEvacuation>().isHelped || isGoingToHelp)
+        if (this == null || gameObject == personToHelp|| personToHelp.GetComponent<AgentEvacuation>().isHelped || isGoingToHelp)
             return;
 
         // we take Sqrt in this case because we want the real position
